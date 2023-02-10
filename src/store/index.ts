@@ -1,8 +1,8 @@
 import {create, StateCreator} from "zustand";
 import {devtools, persist, PersistOptions} from "zustand/middleware";
-import axios from "axios";
 
 import {TodoProps} from "../core/model/types";
+import {http} from "../core/config/http";
 
 interface ITodo {
     todos: TodoProps[];
@@ -44,7 +44,7 @@ export const useTodos = create<ITodo>((devtools as  MyDevtools)((persist as MyPe
         fetchTodos: async () => {
             set({ loading: true });
             try {
-                const response: any = await axios.get("https://jsonplaceholder.typicode.com/todos?_limit=10");
+                const response: any = await http.get("https://jsonplaceholder.typicode.com/todos?_limit=10");
                 if(response.status !== 200) throw new Error("Ошибка при загрузке данных");
                 set({ todos: response.data, error: null });
             } catch (e: any) {
