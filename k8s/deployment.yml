@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $CI_PROJECT_NAME
+  labels:
+    maintainer: ${GITLAB_USER_LOGIN}
+    app: $CI_PROJECT_NAME
+spec:
+  selector:
+    matchLabels:
+      app: $CI_PROJECT_NAME
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        maintainer: ${GITLAB_USER_LOGIN}
+        app: $CI_PROJECT_NAME
+    spec:
+      volumes:
+        - name: config-volume
+          configMap:
+            name: nginx-config
+      containers:
+        - name: ${CI_PROJECT_NAME}-nginx
+          image: reg.1cb.kz/dockerhub/library/nginx:1.17.4-alpine
+          ports:
+            - containerPort: ${APP_PORT}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+
+        - name: ${CI_PROJECT_NAME}
+          image: ${CONTAINER_TAGGED_IMAGE}
+          ports:
+            - containerPort: 5000
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 5000
+            failureThreshold: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+      imagePullSecrets:
+        - name: harbor

@@ -1,0 +1,7 @@
+.BaseImage {
+  @apply w-full h-auto blur-sm;
+
+  &.shown {
+    @apply blur-none;
+  }
+}

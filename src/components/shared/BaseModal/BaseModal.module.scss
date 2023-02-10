@@ -1,0 +1,21 @@
+.BaseModal {
+  @apply fixed top-0 right-0 bottom-0 left-0 bg-dark/50 transition-all flex flex-col items-center overflow-y-auto z-10;
+
+  &Hidden {
+    @apply opacity-0 invisible;
+  }
+  &Shown {
+    @apply opacity-100 visible;
+  }
+}
+
+.BaseModalBody {
+  @apply bg-white p-8 rounded-xl max-w-xl origin-center transition-all duration-500;
+
+  &Hidden {
+    @apply scale-y-0
+  }
+  &Shown {
+    @apply scale-y-100;
+  }
+}

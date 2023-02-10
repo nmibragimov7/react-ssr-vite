@@ -1,0 +1,13 @@
+.BaseInput {
+  @apply h-full w-full rounded-lg leading-none bg-white-blue p-4 placeholder:font-light placeholder:text-gray outline-none border border-solid border-transparent shadow-gray-100;
+}
+
+.BaseInput::-webkit-outer-spin-button,
+.BaseInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.BaseInput:focus,
+.BaseInput:hover {
+  @apply border-primary-blue;
+}

@@ -1,0 +1,11 @@
+.BaseButton {
+  @apply w-full text-center disabled:opacity-30 disabled:cursor-not-allowed shadow px-4 py-2;
+
+  &.primary {
+    @apply bg-primary-blue text-light-blue hover:bg-primary-blue/70 disabled:bg-primary-blue/30 disabled:text-light-blue/30;
+  }
+
+  &.outline {
+    @apply bg-none text-primary-blue disabled:text-light-blue/30;
+  }
+}

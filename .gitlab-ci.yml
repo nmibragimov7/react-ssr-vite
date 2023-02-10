@@ -1,0 +1,54 @@
+stages:
+  - build_release
+  - deploy
+
+.base_release: &base_build_release
+  image:
+    name: reg.1cb.kz/library/kaniko-project/executor:debug
+    entrypoint: [""]
+  allow_failure: false
+
+build_release:dev:
+  tags:
+    - kube-build
+  only:
+    - /^dev-.*/
+  stage: build_release
+  environment:
+    name: k09-staging
+  variables:
+    CONTAINER_TAGGED_IMAGE: $HR_REGISTRY/$CI_PROJECT_NAME-$CI_PROJECT_ID/$CI_PROJECT_NAME:$CI_ENVIRONMENT_SLUG-$CI_PIPELINE_ID
+  script:
+    - ls -a
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$HR_REGISTRY\":{\"username\":\"$HR_REGISTRY_USER\",\"password\":\"$HR_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - KANIKOPROXYBUILDARGS="--build-arg BACKEND_URL=$BACKEND_URL"
+    - echo $KANIKOPROXYBUILDARGS
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile $KANIKOPROXYBUILDARGS --destination $CONTAINER_TAGGED_IMAGE
+  <<: *base_build_release
+
+.base_deploy: &base_deploy
+  stage: deploy
+  variables:
+    CONTAINER_TAGGED_IMAGE: $HR_REGISTRY/$CI_PROJECT_NAME-$CI_PROJECT_ID/$CI_PROJECT_NAME:$CI_ENVIRONMENT_SLUG-$CI_PIPELINE_ID
+  tags:
+    - kube-build
+  image: reg.1cb.kz/library/kubectl
+  script:
+    - ls -a
+    - kubectl create secret docker-registry harbor --docker-server=$HR_REGISTRY --docker-username=$HR_REGISTRY_USER --docker-password=$HR_REGISTRY_PASSWORD --docker-email=$GITLAB_USER_EMAIL --dry-run=client -o yaml | kubectl replace --force -f -
+    - kubectl replace -f ./k8s/nginx-config-map.yml
+    - cat ./k8s/service.yml | envsubst | kubectl apply -f -
+    - cat ./k8s/deployment.yml | envsubst | kubectl apply -f -
+    - cat ./k8s/ingress.yml | envsubst | kubectl replace -f -
+
+deploy:dev:
+  environment:
+    name: k09-staging
+  dependencies: []
+  variables:
+    REPLICAS: 1
+  only:
+    refs:
+      - /^dev-.*/
+  <<: *base_deploy

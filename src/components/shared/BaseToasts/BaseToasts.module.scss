@@ -1,0 +1,31 @@
+.BaseToasts {
+  @apply absolute z-30 top-0 right-0 p-4;
+}
+
+.BaseToast {
+  @apply transition-all invisible opacity-0 text-white rounded-lg min-w-[300px] cursor-pointer p-4 mb-2;
+}
+
+.shown {
+  @apply visible opacity-100;
+}
+
+.title {
+  @apply text-sm font-semibold;
+}
+
+.success {
+  @apply bg-green;
+}
+
+.error {
+  @apply bg-red;
+}
+
+.info {
+  @apply bg-primary-blue;
+}
+
+.warning {
+  @apply bg-orange;
+}
