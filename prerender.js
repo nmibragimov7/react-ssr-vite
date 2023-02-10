@@ -32,9 +32,7 @@ const routesToPrerender = fs
 ;(async () => {
     // pre-render each route...
     for (const url of routesToPrerender) {
-        console.log(render)
         const rendered = render(url.replace('/', ''), manifest)
-
         const html = template
             .replace(`<!--app-head-->`, rendered.head ?? '')
             .replace(`<!--app-html-->`, rendered.html ?? '')
@@ -42,6 +40,4 @@ const routesToPrerender = fs
         const filePath = `./dist/static${url === '/' ? '/index' : url}.html`
         fs.writeFileSync(toAbsolute(filePath), html)
     }
-
-    // fs.unlinkSync(toAbsolute('./dist/static/ssr-manifest.json'))
 })()
